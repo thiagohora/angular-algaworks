@@ -1,0 +1,1 @@
+git e=prod $JAVA_OPTS -jar target/angular-algaworks-*.jar
