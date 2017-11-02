@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -Dspring.profiles.active=prod $JAVA_OPTS -jar target/angular-algaworks*.jar
+web: java -Dserver.port=$PORT -Dspring.profiles.active=prod,oauth $JAVA_OPTS -jar target/angular-algaworks*.jar
