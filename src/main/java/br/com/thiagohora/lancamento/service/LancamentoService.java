@@ -7,5 +7,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface LancamentoService {
     Lancamento salvar(final Lancamento lancamento);
-    Page findAll(LancamentoFilter lancamentoFilter, Pageable pageable);
+    Page findAll(final LancamentoFilter lancamentoFilter, final Pageable pageable);
+    Lancamento update(final Long codigo, Lancamento lancamento);
 }

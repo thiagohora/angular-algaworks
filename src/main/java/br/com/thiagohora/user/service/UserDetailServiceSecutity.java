@@ -1,5 +1,6 @@
 package br.com.thiagohora.user.service;
 
+import br.com.thiagohora.infrastructure.security.token.user.UserInfo;
 import br.com.thiagohora.user.domain.Permissao;
 import br.com.thiagohora.user.domain.User;
 import br.com.thiagohora.user.infrastruture.exception.UserNotFoundException;
@@ -26,14 +27,14 @@ public class UserDetailServiceSecutity implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
 
         final User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         
-        return new org.springframework.security.core.userdetails.User(email, user.getSenha(), getGrantedAuthority(user.getPermissoes()));
+        return new UserInfo(user.getNome(), email, user.getSenha(), getGrantedAuthority(user.getPermissoes()));
     }
 
-    private Collection<? extends GrantedAuthority> getGrantedAuthority(List<Permissao> permissoes) {
+    private Collection<? extends GrantedAuthority> getGrantedAuthority(final List<Permissao> permissoes) {
         return permissoes
                     .stream()
                     .map(permissao -> new SimpleGrantedAuthority(permissao.getDescricao().toUpperCase()))

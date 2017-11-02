@@ -36,14 +36,17 @@ public class CorsFilter extends GenericFilterBean {
 
         final String originPermitted = configuration.getAllowedOrigins();
 
-        response.addHeader("Access-Control-Allow-Origin", originPermitted);
-        response.addHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Origin", originPermitted);
+        response.setHeader("Access-Control-Allow-Credentials", "true");
 
-        if("OPTIONS".equals(request.getMethod()) && originPermitted.equals(request.getHeader("Origin"))) {
-            response.addHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PUT, OPTIONS");
-            response.addHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
-            response.addHeader("Access-Control-Max-Age", "3600");
-            response.setStatus(SC_OK);
+        if ("OPTIONS".equals(request.getMethod()) && originPermitted.equals(request.getHeader("Origin"))) {
+            response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PUT, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
+            response.setHeader("Access-Control-Max-Age", "3600");
+
+            response.setStatus(HttpServletResponse.SC_OK);
+
+            return;
         }
 
         filterChain.doFilter(servletRequest, servletResponse);

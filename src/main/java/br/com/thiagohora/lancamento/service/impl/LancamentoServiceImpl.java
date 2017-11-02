@@ -6,6 +6,9 @@ import br.com.thiagohora.lancamento.domain.projection.LancamentoProjection;
 import br.com.thiagohora.lancamento.repository.LancamentoRepository;
 import br.com.thiagohora.lancamento.repository.query.LancamentoFilter;
 import br.com.thiagohora.lancamento.service.LancamentoService;
+import br.com.thiagohora.pessoa.domain.Pessoa;
+import br.com.thiagohora.pessoa.service.PessoaService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,10 +25,12 @@ import static org.springframework.data.jpa.repository.EntityGraph.EntityGraphTyp
 public class LancamentoServiceImpl implements LancamentoService {
 
     private final LancamentoRepository repository;
+    private final PessoaService pessoaService;
 
     @Autowired
-    public LancamentoServiceImpl(LancamentoRepository repository) {
+    public LancamentoServiceImpl(LancamentoRepository repository, PessoaService pessoaService) {
         this.repository = repository;
+        this.pessoaService = pessoaService;
     }
 
     @Override
@@ -55,6 +60,29 @@ public class LancamentoServiceImpl implements LancamentoService {
                                                             .orElse(null);
 
         return repository.findAll(specification, LancamentoProjection.class, pageable, Lancamento.GRAPH, FETCH);
+    }
+
+    private void validarPessoa(Lancamento lancamento) {
+        Pessoa pessoa = null;
+        if (lancamento.getPessoa().getCodigo() != null) {
+            pessoa = pessoaService.buscarPessoaPeloCodigo(lancamento.getPessoa().getCodigo());
+        }
+
+        if (pessoa == null || pessoa.isInativo()) {
+            throw new IllegalStateException();
+        }
+    }
+
+    @Override
+    public Lancamento update(Long codigo, Lancamento lancamento) {
+        Lancamento lancamentoSalvo = repository.findOne(codigo);
+        if (!lancamento.getPessoa().equals(lancamentoSalvo.getPessoa())) {
+            validarPessoa(lancamento);
+        }
+
+        BeanUtils.copyProperties(lancamento, lancamentoSalvo, "codigo");
+
+        return repository.save(lancamentoSalvo);
     }
 
 
